@@ -15,13 +15,13 @@
 - [x] 创建 `README.md`
 - [x] 创建 `AGENTS.md`
 - [x] 创建 `roadmap.md`
-- [ ] 创建基础 `docs/`
-- [ ] 创建 `requirements.txt`
-- [ ] 完成第一次 Git commit
-- [ ] 创建 GitHub 私有仓库
-- [ ] 连接 GitHub remote
-- [ ] 完成第一次 push
-- [ ] Day 0 最终验收
+- [x] 创建基础 `docs/`
+- [x] 创建 `requirements.txt`
+- [x] 完成第一次 Git commit
+- [x] 创建 GitHub 私有仓库
+- [x] 连接 GitHub remote
+- [x] 完成第一次 push
+- [x] Day 0 最终验收
 
 ---
 
