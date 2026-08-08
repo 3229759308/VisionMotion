@@ -252,7 +252,7 @@ Observation
 
 ## Current Stage
 
-Day 0 已完成并验收，当前准备进入 Day 1 - Camera Input。
+Day 1 - Camera Input 进行中。
 
 Day 0 已完成内容包括：
 
@@ -269,4 +269,8 @@ Day 0 已完成内容包括：
 - GitHub remote
 - 第一次 push
 
-当前尚未开始 Day 1 的 OpenCV 摄像头开发。
+当前已完成 IP Webcam 局域网 HTTP/MJPEG 输入路线的第一轮验证，PC 浏览器和 OpenCV 均可稳定获取实时画面。
+
+HTTP/MJPEG 只是当前已验证的摄像头输入方案之一，尚未确定为最终方案。后续仍计划比较其他摄像头输入方案。
+
+当前继续完成 Day 1 的输入方案比较和验收，不要提前进入目标检测、目标跟踪、标定等后续阶段。

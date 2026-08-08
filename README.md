@@ -25,7 +25,9 @@ Android Camera
 
 ## Current Stage
 
-Day 0 已完成并验收，当前准备进入 Day 1 - Camera Input。
+Day 1 - Camera Input 进行中。
+
+使用 IP Webcam 通过局域网 HTTP/MJPEG 提供视频的路线已完成第一轮验证，PC 浏览器和 OpenCV 均可稳定获取实时画面。该路线目前尚未确定为最终摄像头输入方案。
 
 ## Environment
 
