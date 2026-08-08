@@ -252,9 +252,9 @@ Observation
 
 ## Current Stage
 
-Day 0：工程环境、Git 版本管理和项目基础结构搭建。
+Day 0 已完成并验收，当前准备进入 Day 1 - Camera Input。
 
-当前 Day 0 重点包括：
+Day 0 已完成内容包括：
 
 - Git 配置
 - Git repository 初始化
@@ -269,4 +269,4 @@ Day 0：工程环境、Git 版本管理和项目基础结构搭建。
 - GitHub remote
 - 第一次 push
 
-当前不要提前进入 Day 1 的 OpenCV 摄像头开发，除非 Day 0 已经完成。
+当前尚未开始 Day 1 的 OpenCV 摄像头开发。

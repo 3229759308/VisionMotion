@@ -25,7 +25,7 @@ Android Camera
 
 ## Current Stage
 
-Day 0：工程环境、Git 版本管理和项目基础结构搭建。
+Day 0 已完成并验收，当前准备进入 Day 1 - Camera Input。
 
 ## Environment
 
