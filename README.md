@@ -25,9 +25,16 @@ Android Camera
 
 ## Current Stage
 
-Day 1 - Camera Input 进行中。
+Day 2 - Basic Target Detection 准备开始，尚未进入实现。
 
-使用 IP Webcam 通过局域网 HTTP/MJPEG 提供视频的路线已完成第一轮验证，PC 浏览器和 OpenCV 均可稳定获取实时画面。该路线目前尚未确定为最终摄像头输入方案。
+当前摄像头输入方案：
+
+- 主方案：DroidCam + USB + ADB Forward
+- 备用方案：IP Webcam / Wi-Fi MJPEG
+
+主方案已验证 OpenCV 可稳定读取 1920×1080 视频，在正常光照下约 30 FPS，并通过连续约 5 分钟稳定性测试。
+
+下一阶段为 Day 2 - Basic Target Detection，目标是使用简单、透明的传统视觉方法识别彩色目标。
 
 ## Environment
 

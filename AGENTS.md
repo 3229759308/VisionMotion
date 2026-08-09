@@ -252,7 +252,7 @@ Observation
 
 ## Current Stage
 
-Day 1 - Camera Input 进行中。
+Day 2 - Basic Target Detection 准备开始，尚未进入实现。
 
 Day 0 已完成内容包括：
 
@@ -269,8 +269,11 @@ Day 0 已完成内容包括：
 - GitHub remote
 - 第一次 push
 
-当前已完成 IP Webcam 局域网 HTTP/MJPEG 输入路线的第一轮验证，PC 浏览器和 OpenCV 均可稳定获取实时画面。
+当前摄像头输入方案：
 
-HTTP/MJPEG 只是当前已验证的摄像头输入方案之一，尚未确定为最终方案。后续仍计划比较其他摄像头输入方案。
+- 主方案：DroidCam + USB + ADB Forward
+- 备用方案：IP Webcam / Wi-Fi MJPEG
 
-当前继续完成 Day 1 的输入方案比较和验收，不要提前进入目标检测、目标跟踪、标定等后续阶段。
+主方案已验证 OpenCV 可稳定读取 1920×1080 视频，在正常光照下约 30 FPS，并通过连续约 5 分钟稳定性测试。
+
+下一阶段为 Day 2 - Basic Target Detection，目标是使用简单、透明的传统视觉方法识别彩色目标。
