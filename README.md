@@ -25,7 +25,10 @@ Android Camera
 
 ## Current Stage
 
-Day 2 - Basic Target Detection 准备开始，尚未进入实现。
+Day 2 - Basic Target Detection 正在进行中，尚未完成阶段收尾。
+
+当前分支为 `feat/basic-target-detection`，已完成第一个代码 checkpoint：
+`6a29d16 feat: add basic color target detection`。
 
 当前摄像头输入方案：
 
@@ -34,7 +37,9 @@ Day 2 - Basic Target Detection 准备开始，尚未进入实现。
 
 主方案已验证 OpenCV 可稳定读取 1920×1080 视频，在正常光照下约 30 FPS，并通过连续约 5 分钟稳定性测试。
 
-下一阶段为 Day 2 - Basic Target Detection，目标是使用简单、透明的传统视觉方法识别彩色目标。
+当前已使用 HSV 阈值分割、形态学闭运算和外部轮廓检测，实现橙色目标候选选择、面积门槛、轮廓质心、Bounding Box 与实时位置显示。
+
+这只是面向受控环境的第一版基础检测器。固定 HSV 阈值、最大轮廓策略和固定面积门槛在较大光照变化、同色背景、远距离目标及遮挡条件下均存在已知限制，不能视为最终鲁棒目标识别方案。当前继续完成 Day 2 验证与收尾，不进入 Tracking、世界坐标或后续阶段。
 
 ## Environment
 

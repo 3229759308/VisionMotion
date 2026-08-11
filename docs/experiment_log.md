@@ -181,3 +181,94 @@ DroidCam + USB + ADB Forward 方案验证成功。当前环境下可以稳定向
 ### Next Action
 
 完成 Day 1 收尾和 Git checkpoint，之后再进入下一阶段。当前不提前进入目标检测、跟踪或标定。
+
+---
+
+## EXP-003
+
+### Date
+
+2026-08-11
+
+### Title
+
+Day 2 - Basic Color Target Detection
+
+### Purpose
+
+在 DroidCam USB + ADB Forward 已稳定提供视频输入的基础上，使用简单、透明的传统视觉方法建立并验证第一版橙色目标检测流程，输出目标是否有效、像素中心和轮廓面积。
+
+### Version
+
+- 开发分支：`feat/basic-target-detection`
+- 代码 checkpoint：`6a29d16 feat: add basic color target detection`
+- 实验代码：`target_detection_test.py`
+- checkpoint 后初始工作区状态：clean
+
+### Environment and Input
+
+- Windows PC
+- Android 手机
+- DroidCam USB + ADB Forward
+- OpenCV 视频地址：`http://127.0.0.1:4747/video/1920x1080`
+- 输入分辨率：1920×1080
+- 正常光照下实际读取帧率：约 30 FPS
+- 受控实验目标：橙色物体
+- 主要背景：大理石桌面
+
+### Color Sampling
+
+- 大理石桌面典型 BGR：约 `[179, 184, 187]`
+- 橙色目标典型 BGR：约 `[15, 106, 208]`
+- 橙色目标典型 HSV：约 `[14, 237, 208]`
+- 暗光下同一橙色目标 HSV：曾测得约 `[11, 193, 152]`
+- 实验观察：色相 `H` 相对稳定，明度 `V` 会随环境亮度明显变化
+
+### Parameters and Method
+
+- 将摄像头 BGR 帧转换为 HSV。
+- 根据实测颜色建立第一版橙色阈值：
+  - `lower_orange = (8, 150, 120)`
+  - `upper_orange = (20, 255, 255)`
+- 使用 `cv2.inRange()` 生成二值 Mask。
+- 使用 5×5 椭圆结构元素执行 `MORPH_CLOSE` 闭运算，减少目标区域内的小孔洞和裂缝。
+- 使用 `findContours()`、`RETR_EXTERNAL` 和 `CHAIN_APPROX_SIMPLE` 提取外部轮廓。
+- 将面积最大的外部轮廓作为 candidate，并设置 `MIN_TARGET_AREA = 5000`；仅当 `candidate_area >= 5000` 时将其升级为 target。
+- 使用 `cv2.moments()` 计算目标轮廓质心；当 `m00 == 0` 时，代码回退到外接矩形中心。
+- 在画面上显示绿色 Bounding Box、蓝色目标中心点和 `Target: (x, y)`；终端周期性输出检测状态、中心、面积、轮廓数量和候选面积。
+
+### Test Method
+
+- 在正常光照下放置完整橙色目标，观察二值 Mask、外部轮廓、检测状态、中心坐标和面积。
+- 完全移除橙色目标，检查无候选轮廓时的轮廓数量和检测状态。
+- 将橙色目标缩小到轮廓面积低于门槛，检查“存在轮廓”和“有效目标”是否被正确区分。
+- 将目标从画面左侧移动到右侧，检查 `target_x` 是否随实际运动单调增大。
+- 比较 `cv2.moments()` 轮廓质心与外接矩形中心，记录完整目标和遮挡目标的中心差值。
+- 遮挡目标，观察轮廓面积、碎片轮廓数量和视觉质心变化。
+
+### Results
+
+- DroidCam USB + ADB Forward 继续稳定向 OpenCV 提供 1920×1080 视频；正常光照下约 30 FPS。
+- 在当前受控场景中，真实目标轮廓面积通常约 80000 px²，大量噪声轮廓仅为 0 到几十 px²。
+- 完全移除橙色目标时，输出 `Contours: 0` 和 `Target Detected: False`。
+- 正常目标面积约 80000 px² 时，输出 `Target Detected: True`。
+- 小目标面积约 2800 px² 时仍可观察到 `Contours > 0`，但因未达到 5000 px² 门槛，输出 `Target Detected: False`。
+- 目标从左向右移动时，`target_x` 实测约为 `271 → 330 → 697 → 1137 → 1565`，变化方向符合预期。
+- 完整近似圆形目标的轮廓质心与外接矩形中心差值通常约为 `(-2, -1)` px。
+- 遮挡后中心差值增大到约 7～8 px，说明视觉质心会随可见轮廓形状变化。
+- 遮挡实验中目标面积由约 82000 px² 降至约 24000～34000 px²，并出现更多碎片轮廓。
+- 已实现并实际观察到绿色 Bounding Box、蓝色目标中心点、`Target Detected: True / False`、实时 `Target Center (x, y)`、`Target Area` 和画面中的 `Target: (x, y)`。
+
+### Known Limitations
+
+- 固定 HSV 阈值会受较大光照变化影响；当前仅根据有限受控条件下的采样设定。
+- 最大轮廓策略在画面中出现更大同色背景或物体时可能选错目标。
+- 固定 `MIN_TARGET_AREA` 会拒绝面积过小的远距离目标，即使其颜色轮廓存在。
+- 遮挡会降低轮廓面积、增加碎片轮廓，并改变视觉质心。
+- 当前规则是教学和基础实验阶段的简化假设，只能称为“第一版受控环境基础检测器”，不能视为最终鲁棒目标识别方案。
+
+### Conclusion
+
+Day 2 的基础检测链路已经打通：`BGR → HSV → 阈值分割 → 二值 Mask → 闭运算 → 外部轮廓 → 面积门槛 → 轮廓质心与画面标注`。在当前受控环境中，橙色目标可以被稳定区分，并能输出方向正确的像素中心位置。
+
+Day 2 尚未全部完成。下一步仅继续验证更大同色干扰物、更大光照变化和距离变化下的失效边界，并完成本阶段验收与收尾；暂不进入 Tracking、世界坐标、标定、Kalman Filter 或 AI/YOLO。
