@@ -38,7 +38,8 @@ Camera Observation
 当前阶段：
 
 ```text
-Day 2 - Basic Target Detection
+Day 2 - Basic Target Detection 已完成
+Day 3 - Target Tracking 尚未开始
 ```
 
 当前分支：
@@ -56,7 +57,7 @@ feat/basic-target-detection
 文档 checkpoint：
 
 ```text
-02fa25d docs: add project handoff
+ec8aae8 docs: record same-color interference test
 ```
 
 当前 Git 状态：
@@ -67,7 +68,7 @@ local / remote synchronized
 upstream: origin/feat/basic-target-detection
 ```
 
-Day 2 尚未完成。
+Day 2 已完成最终验收与阶段收尾。下一阶段为 Day 3，但尚未开始实现。
 
 ---
 
@@ -134,6 +135,18 @@ http://192.168.2.201:8080/video
 - 约 30 FPS
 - 约 10 分钟稳定
 - 延迟主观 < 0.5 s
+
+### Day 2 - Basic Target Detection
+
+已完成 HSV 阈值分割、形态学闭运算、外部轮廓检测、最大候选选择、面积门槛、轮廓质心、Bounding Box 和实时目标位置显示，并完成无目标、同色干扰、光照变化、距离变化与遮挡边界验证。
+
+最终定位：
+
+```text
+第一版受控环境基础检测器
+```
+
+该阶段没有实现 Tracking，也没有解决任意环境下的目标身份判断。
 
 ---
 
@@ -291,12 +304,27 @@ BGR ≈ [37, 78, 152]
 HSV ≈ [11, 193, 152]
 ```
 
+光照边界代表数据：
+
+```text
+正常亮面 HSV = [10, 232, 208]
+正常阴影面 HSV = [7, 244, 138]，H 低于下限 8
+较暗环境 HSV = [8, 202, 121]，H / V 接近下边界
+继续变暗 HSV = [7, 211, 52] / [5, 199, 50] / [6, 185, 40]
+→ Contours = 0
+→ Target Detected = False
+
+强光直射 HSV = [30, 2, 255]
+→ 像素接近白色，S = 2，局部颜色信息丢失
+```
+
 实验结论：
 
 - H 相对稳定
 - V 会随亮度明显下降
 - S 也会变化
 - HSV 比直接使用 BGR 更适合当前颜色分割，但并不等于不受光照影响
+- 暗光下 FPS 降至约 14 FPS，与手机自动曝光导致帧率下降的既有观察一致
 
 ---
 
@@ -374,6 +402,18 @@ candidate 存在
 ≠
 candidate 一定是有效 target
 ```
+
+距离变化门槛对照：
+
+```text
+较远：Contours = 5，最大 Area = 4531.5 < 5000
+→ Target Detected = False
+
+稍近：Area = 5183.5 > 5000
+→ Target Detected = True
+```
+
+同一真实目标的物理尺寸未改变，但距离增加会减小图像中的像素面积。远距离失败时轮廓仍存在，是被固定面积门槛拒绝；不能与暗光造成 `Contours = 0` 的 HSV 分割失败混为一谈。
 
 ---
 
@@ -478,13 +518,15 @@ MIN_TARGET_AREA = 5000
 
 ### 固定 HSV
 
-更大的光照变化可能使颜色超出当前范围：
+实验已确认固定 HSV 阈值只在有限光照范围内有效：
 
 ```text
 H: 8 ~ 20
 S: 150 ~ 255
 V: 120 ~ 255
 ```
+
+环境过暗会使 `H / V` 越界并导致 Mask 中目标消失；强烈过曝会使饱和度大幅下降并丢失局部颜色信息。这不表示 HSV 不适合颜色识别；相比直接 BGR，HSV 仍更适合当前颜色分割。
 
 ### 最大轮廓策略
 
@@ -512,7 +554,7 @@ candidate = max(contours, key=cv2.contourArea)
 MIN_TARGET_AREA = 5000
 ```
 
-可能导致远距离目标因面积变小而被拒绝。
+实验已确认其存在距离 / 图像尺度适用边界：同一真实目标较远时面积为 `4531.5 px²`，轮廓存在但被拒绝；稍近时面积为 `5183.5 px²`，通过门槛并被检测。
 
 ### 遮挡
 
@@ -538,7 +580,7 @@ MIN_TARGET_AREA = 5000
 
 ---
 
-## 16. Day 2 当前 Roadmap 状态
+## 16. Day 2 最终 Roadmap 状态
 
 已完成：
 
@@ -553,42 +595,32 @@ MIN_TARGET_AREA = 5000
 [x] 在画面上显示目标位置
 [x] 无目标场景测试
 [x] 更大同色干扰物场景测试
-```
-
-仍未完成：
-
-```text
-[ ] 更大光照变化和距离变化测试
-[ ] Day 2 最终验收与阶段收尾
+[x] 更大光照变化和距离变化测试
+[x] Day 2 最终验收与阶段收尾
 ```
 
 ---
 
-## 17. 下一步：更大光照变化和距离变化测试
+## 17. 下一阶段：Day 3 - Target Tracking
 
-暂时不要修改代码、HSV 阈值或 `MIN_TARGET_AREA`。
+Day 3 尚未开始实现，下一步不要直接编写 Tracking 代码。
 
-实验目的：
-
-验证当前固定参数的适用边界：
+先由 ChatGPT 解释：
 
 ```text
-固定 HSV 阈值在更大光照变化下是否仍能保留目标轮廓
-固定面积门槛在目标距离增大、轮廓面积减小时何时拒绝目标
+“单帧目标检测”和“连续目标跟踪”的区别
+为什么需要保存历史中心点
 ```
 
-实验中记录光照和距离变化条件、`Target Detected`、`Target Area`、轮廓数量及主要候选面积，用实际数据确定固定 HSV 与固定面积门槛的适用范围。
-
-在完成这些剩余边界验证前，不加入形状、圆度、长宽比等解决方案，也不进入 Tracking、World Coordinate、Homography、Kalman Filter 或 YOLO / Deep Learning。
+理解这些概念后，再开始 Day 3 的第一个最小实现。继续遵守一次只学习一个新步骤、先解释再实验的协作方式。
 
 ---
 
-## 18. 暂时不要进入的内容
+## 18. 下一阶段边界
 
-Day 2 完成前不要提前进入：
+Day 3 开始前不直接写 Tracking 代码，也不要提前进入：
 
 ```text
-Tracking
 World Coordinate
 Calibration / Homography
 Motion Estimation
@@ -745,6 +777,6 @@ Git branch / log / status 和最新实验结果，更新 VisionMotion_HANDOFF.md
 
 ```text
 VisionMotion 已完成稳定手机摄像头输入和第一版 HSV 橙色目标检测，
-已实际验证最大轮廓策略在出现更大同色干扰物时会误选干扰物，
-下一步验证固定 HSV 与固定面积门槛在更大光照变化和距离变化下的适用边界。
+已完成 Day 2 并实际验证同色大干扰物、极端光照、距离变化和遮挡等限制；
+下一阶段为 Day 3 - Target Tracking，但尚未开始实现。
 ```

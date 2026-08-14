@@ -252,7 +252,7 @@ Observation
 
 ## Current Stage
 
-Day 2 - Basic Target Detection 正在进行中，尚未完成阶段收尾。
+Day 2 - Basic Target Detection 已完成。下一阶段为 Day 3 - Target Tracking，但尚未开始。
 
 已完成第一个代码 checkpoint：
 
@@ -261,7 +261,7 @@ Day 2 - Basic Target Detection 正在进行中，尚未完成阶段收尾。
 - 代码：`target_detection_test.py`
 - 已实现：HSV 阈值分割、形态学闭运算、外部轮廓检测、面积门槛、轮廓质心、Bounding Box 和实时目标位置显示
 
-当前算法定位为“第一版受控环境基础检测器”。固定 HSV 阈值、最大轮廓策略和固定面积门槛均有明确适用边界，不应描述为最终鲁棒目标识别方案。
+当前算法定位为“第一版受控环境基础检测器”。已实际验证更大同色干扰物、固定 HSV 光照边界、强光过曝、固定面积门槛距离边界和遮挡影响，不应描述为最终鲁棒目标识别方案。
 
 Day 0 已完成内容包括：
 
@@ -285,4 +285,4 @@ Day 0 已完成内容包括：
 
 主方案已验证 OpenCV 可稳定读取 1920×1080 视频，在正常光照下约 30 FPS，并通过连续约 5 分钟稳定性测试。
 
-当前继续完成 Day 2 的边界验证与阶段收尾。在此之前不进入 Tracking、世界坐标、标定、Kalman Filter 或 AI/YOLO 等后续工作。
+下一步先理解单帧目标检测与连续目标跟踪的区别，以及保存历史中心点的必要性，再开始 Day 3 的第一个最小实现。暂不进入世界坐标、标定、Motion Estimation、Kalman Filter 或 AI/YOLO 等后续工作。
